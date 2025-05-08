@@ -66,6 +66,7 @@ export class AppService {
       // Create ETH balance object
       const ethTokenBalance: TokenBalance = {
         symbol: "ETH",
+        // Convert BigInt to string to make it serializable
         balance: ethBalance.toString(),
         decimals: 18,
         formattedBalance: ethers.formatEther(ethBalance),
@@ -101,8 +102,10 @@ export class AppService {
 
       return {
         symbol,
+        // Convert BigInt to string to make it serializable
         balance: balance.toString(),
-        decimals,
+        // Convert decimals to number if it's a BigInt
+        decimals: typeof decimals === "bigint" ? Number(decimals) : decimals,
         formattedBalance: ethers.formatUnits(balance, decimals),
       };
     } catch (error) {
