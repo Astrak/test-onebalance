@@ -33,7 +33,6 @@ const AddressForm: React.FC<AddressFormProps> = ({
   return (
     <div className="card mb-4">
       <div className="card-body">
-        <h3 className="card-title mb-3">Check Ethereum Balances</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="address" className="form-label">

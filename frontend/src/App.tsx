@@ -40,9 +40,6 @@ function App() {
         <div className="col-md-8">
           <header className="text-center mb-5">
             <h1 className="mb-3">Ethereum Balance Checker</h1>
-            <p className="lead">
-              Check your ETH, USDC, and LINK balances on Ethereum mainnet
-            </p>
           </header>
 
           <AddressForm onAddressSubmit={fetchBalances} isLoading={loading} />
@@ -55,7 +52,6 @@ function App() {
 
           {balanceData && (
             <div className="mt-4">
-              <h4 className="mb-3">Balances for {balanceData.address}</h4>
               <div className="row">
                 {balanceData.balances.map((balance: TokenBalance) => (
                   <div className="col-md-4" key={balance.symbol}>
