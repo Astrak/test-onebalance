@@ -99,7 +99,6 @@ export class AppService {
       // Get token decimals and balance
       const decimals = await contract.decimals();
       const balance = await contract.balanceOf(address);
-
       return {
         symbol,
         // Convert BigInt to string to make it serializable

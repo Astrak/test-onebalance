@@ -1,5 +1,6 @@
 import React from "react";
 import { TokenBalance } from "../types/balance.types";
+import { show4SignificantDigits } from "../utils/show4SignificantDigits";
 
 interface BalanceCardProps {
   balance: TokenBalance;
@@ -43,10 +44,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ balance }) => {
           {icon} {symbol}
         </h5>
         <p className="card-text fs-4">
-          {parseFloat(formattedBalance).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 6,
-          })}
+          {show4SignificantDigits(formattedBalance)}
         </p>
       </div>
     </div>
