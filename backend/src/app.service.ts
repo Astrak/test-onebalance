@@ -30,18 +30,28 @@ const TOKEN_CONTRACTS = {
   LINK: "0x514910771AF9Ca656af840dff83E8264EcF986CA", // Chainlink
 };
 
+const CACHE: BalanceResponse[] = [];
+
 @Injectable()
 export class AppService {
   private provider: ethers.JsonRpcProvider;
 
   constructor() {
-    // Initialize provider with a public Ethereum RPC URL
-    // For production, use your own Infura/Alchemy API key
     this.provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com");
   }
 
   async getTokenBalances(address: string): Promise<BalanceResponse> {
     try {
+      const cachedValue = CACHE.find(
+        (cachedBalance) =>
+          cachedBalance.address === address &&
+          cachedBalance.date + 60000 > Date.now()
+      );
+
+      if (cachedValue !== undefined) {
+        return cachedValue;
+      }
+
       // Fetch ETH balance
       const ethBalance = await this.provider.getBalance(address);
 
@@ -73,10 +83,23 @@ export class AppService {
       };
 
       // Return the complete balance response
-      return {
+      const balanceResponse = {
         address,
+        date: Date.now(),
         balances: [ethTokenBalance, usdcBalance, linkBalance],
       };
+
+      const addressIndexInCache = CACHE.findIndex(
+        (cachedResponses) => cachedResponses.address === address
+      );
+
+      if (addressIndexInCache === -1) {
+        CACHE.push(balanceResponse);
+      } else {
+        CACHE[addressIndexInCache] = balanceResponse;
+      }
+
+      return balanceResponse;
     } catch (error) {
       console.error("Error fetching balances:", error);
       throw new Error("Failed to fetch token balances");
