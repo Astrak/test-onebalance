@@ -26,7 +26,7 @@ const ERC20_ABI = [
 
 // Token contract addresses on Ethereum mainnet
 const TOKEN_CONTRACTS = {
-  USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+  USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
   LINK: "0x514910771AF9Ca656af840dff83E8264EcF986CA", // Chainlink
 };
 
@@ -57,9 +57,9 @@ export class AppService {
 
       // Prepare token balance promises
       const usdcBalancePromise = this.getERC20Balance(
-        TOKEN_CONTRACTS.USDC,
+        TOKEN_CONTRACTS.USDT,
         address,
-        "USDC"
+        "USDT"
       );
       const linkBalancePromise = this.getERC20Balance(
         TOKEN_CONTRACTS.LINK,
