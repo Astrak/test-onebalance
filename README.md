@@ -11,7 +11,7 @@ npm run install:all
 ## Startup
 
 ```bash
-npm start
+npm run start:dev
 ```
 
 ## Explanation
@@ -25,3 +25,6 @@ I had a battery issue at the café I was working at, I have a portable battery b
 I have then coded the requirement for displaying the 4 significant digits of a balance (code in frontend/src/utils/show4SignificantDigits.ts). I did balance result caching as well, as was suggested in the requirements. For this test I did a simple object cache. For a dev or production server, a DB would of course be needed. I would need to set up a DB in the environment and ideally dockerize the whole to make it more convenient but I have stopped there.
 
 Happy to discuss the code in a video call.
+
+UPDATE from May 13th:
+I've fixed an error of checking USDC instead of USDT, and I've implemented a dockerized Redis cache.

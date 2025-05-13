@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ethers } from "ethers";
 import { BalanceResponse, TokenBalance } from "./interfaces/balance.interface";
+import { CacheService } from "./cache.service";
 
 // ERC20 ABI for balanceOf function
 const ERC20_ABI = [
@@ -30,27 +31,31 @@ const TOKEN_CONTRACTS = {
   LINK: "0x514910771AF9Ca656af840dff83E8264EcF986CA", // Chainlink
 };
 
-const CACHE: BalanceResponse[] = [];
-
 @Injectable()
 export class AppService {
   private provider: ethers.JsonRpcProvider;
+  private readonly logger = new Logger(AppService.name);
 
-  constructor() {
+  constructor(private cacheService: CacheService) {
     this.provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com");
   }
 
   async getTokenBalances(address: string): Promise<BalanceResponse> {
     try {
-      const cachedValue = CACHE.find(
-        (cachedBalance) =>
-          cachedBalance.address === address &&
-          cachedBalance.date + 60000 > Date.now()
+      // Try to get from cache first
+      const cacheKey = `balances:${address}`;
+      const cachedValue = await this.cacheService.get<BalanceResponse>(
+        cacheKey
       );
 
-      if (cachedValue !== undefined) {
+      if (cachedValue !== null) {
+        this.logger.debug(`Cache hit for address: ${address}`);
         return cachedValue;
       }
+
+      this.logger.debug(
+        `Cache miss for address: ${address}, fetching from blockchain`
+      );
 
       // Fetch ETH balance
       const ethBalance = await this.provider.getBalance(address);
@@ -89,15 +94,14 @@ export class AppService {
         balances: [ethTokenBalance, usdcBalance, linkBalance],
       };
 
-      const addressIndexInCache = CACHE.findIndex(
-        (cachedResponses) => cachedResponses.address === address
-      );
-
-      if (addressIndexInCache === -1) {
-        CACHE.push(balanceResponse);
-      } else {
-        CACHE[addressIndexInCache] = balanceResponse;
-      }
+      // Store in cache with 60 second TTL
+      this.cacheService
+        .set(cacheKey, balanceResponse, 60)
+        .catch((err) =>
+          this.logger.error(
+            `Failed to cache balance for ${address}: ${err.message}`
+          )
+        );
 
       return balanceResponse;
     } catch (error) {
